@@ -57,34 +57,39 @@ The Evented API specification has been designed so that signalling events by eve
 
 * How it Works
 
-* Event Schema
+** Event Schema
 
 An event has the following components:
-- event domain - serves as a namespace for the event. A given event consumer may have more than one domain. (required)
-- event name - serves to identify the event. An event with name X in domain A (A:X) is different than an event named X in domain B (B:X). The event generator must ensure that the set of event names within and event domain are unique. (required)
-- timestamp - indicates when the event occurred. The event consumer will use the time that the event is received as a timestamp if the timestamp is not included in the event. (optional)
-- attributes - key-value pairs that further define and describe the event. The names and content of the attributes are wholly up to the discretion of the event generator. (optional)
-- entity identifier - Most events are raised for a particular entity. The event consumer is free to choose any identity scheme that serves its purpose. The operation and structure of the identifier are beyond the scope of this document. (optional)
+- *event domain* - serves as a namespace for the event. A given event consumer may have more than one domain. /(required)/
+- *event name* - serves to identify the event. An event with name X in domain A (=A:X=) is different than an event named X in domain B (=B:X=). The event generator must ensure that the set of event names within and event domain are unique. /(required)/
+- *timestamp* - indicates when the event occurred. The event consumer will use the time that the event is received as a timestamp if the timestamp is not included in the event. /(optional)/
+- *attributes* - key-value pairs that further define and describe the event. The names and content of the attributes are wholly up to the discretion of the event generator. /(optional)/
+- *entity identifier* - Most events are raised for a particular entity. The event consumer is free to choose any identity scheme that serves its purpose. The operation and structure of the identifier are beyond the scope of this document. /(optional)/
 
-Event Dictionary
+** Event Dictionary
 
 Event generators are responsible for publishing a dictionary of events by domain and name. The dictionary should list possible attributes along with the syntax and semantics. Event consumers are responsible for understanding the event dictionary. 
-Event Signal URL
+
+** Event Signal URL
 
 An event consumer subscribes to an event generator by recording the consumer’s event signal URL. The semantics of the event signal URL are opaque to the event generator although its structure should have meaning to the event consumer.  The event signal URL encodes the entity identifier and thus represents an event consumer for a particular entity. 
+
 The event consumer creates the event signal URL, as follows:
-The schema must be either http or https. 
-The domain may be any domain that is convenient to the event consumer.
-The path may contain any static information useful to the event consumer in processing the request. If the event consumer uses an entity identifier, it must be placed in the path. Since the identifier is placed in the path, it must be URL encoded if it contains characters that cannot be put in the path. 
+- The schema must be either =http= or =https=. 
+- The domain may be any domain that is convenient to the event consumer.
+- The path /may contain/ any static information useful to the event consumer in processing the request. If the event consumer uses an entity identifier, it /must be/ placed in the path. Since the identifier is placed in the path, it /must be/ URL encoded if it contains characters that cannot be put in the path. 
 
-The event signal URL must not contain a query string. 
-Event Signaling
+The event signal URL /must not/ contain a query string. 
 
-The event generator signals an event by encoding the event as a query string, appending it to the event signal URLs that it has recorded, and using HTTP to signal each URL. 
-The event generator should signal events using HTTP POST using the event signal URL. The event domain, event name, and attributes must be sent as key-value pairs in the body of the POST. Keys with a leading underscore character are reserved. 
+** Event Signaling
+
+The event generator signals an event by encoding the event as a query string, appending it to the event signal URLs that it has recorded, and using HTTP to signal each URL.
+ 
+The event generator should signal events using HTTP POST using the event signal URL. The event domain, event name, and attributes must be sent as key-value pairs in the body of the POST. Keys with a leading underscore character are reserved.
+ 
 There are two required key-value pairs that must be sent:
-_domain is the key for the event domain
-_name is the key for the event name
+- =_domain= is the key for the event domain
+- =_nam=e is the key for the event name
 
 The values sent for _domain and _name must be a string made of alphanumeric, underscore, dot, and dash characters [a-zA-Z0-9_.-].  
 In addition to the required key-value pairs given above, the generator may include any other attributes that the generator wishes to send with the event. 
