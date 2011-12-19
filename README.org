@@ -157,7 +157,7 @@ The steps are:
 4. User logs into the event generator.
 5. User stores the event signal URL at the generator using an interface. 
 
-Event generator uses the event signal URL to signal event X in domain A (=<esl>?_domain\=A&_name\=X=).
+Event generator uses the event signal URL to signal event X in domain A (=<esl>?_domain=A&_name=X=).
 
 The event generator now has a entity-specific URL that it can use to signal events to the event consumer. This process can be automated in various ways. For example, Web-annotation technologies can be used to allow users to configure a consumer installation without directly wrangling URLs.
 
@@ -170,7 +170,7 @@ This, combined with the 410 error response, will serve to prevent attackers from
 
 ** Change _timestamp argument to XSD:Datetime
 
-This would simplify parsing of timestamps. (Docs for XSD:Datetime)
+This would simplify parsing of timestamps. ([Docs for XSD:Datetime http://www.w3.org/TR/xmlschema-2/#dateTime])
 
 ** Adopt Salmon Magic Signatures as an optional event signature
 
