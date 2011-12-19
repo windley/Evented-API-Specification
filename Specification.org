@@ -1,6 +1,6 @@
 #+TITLE: Evented API Specification
 #+Options: num:nil
-#+STARTUP: odd
+#+STARTUP: odd, showall
 #+Style: <style> h1,h2,h3 {font-family: arial, helvetica, sans-serif} </style>
 
 * Authors
@@ -59,7 +59,7 @@ Years ago, computer designers discovered that having some components interrupt t
 
 ** Events are State Changes
 
-An event is a notification of a state change in an Evented API. The temporal granularity of an event is assumed to be small, although unspecified.  Event generators are free to determine what “state change” means. Event generators may specify a timestamp indicating when the event . occurred. If the timestamp is missing in the event signal, the timestamp of the event is determined by the timestamp of its delivery. 
+An event is a notification of a state change in an Evented API. The temporal granularity of an event is assumed to be small, although unspecified.  Event generators are free to determine what “state change” means. Event generators /may specify/ a timestamp indicating when the event . occurred. If the timestamp is missing in the event signal, the timestamp of the event is determined by the timestamp of its delivery. 
 
 ** Language and Platform Agnostic
 
@@ -74,8 +74,8 @@ The Evented API specification has been designed so that signalling events by eve
 ** Event Schema
 
 An event has the following components:
-- *event domain* - serves as a namespace for the event. A given event consumer may have more than one domain. /(required)/
-- *event name* - serves to identify the event. An event with name X in domain A (=A:X=) is different than an event named X in domain B (=B:X=). The event generator must ensure that the set of event names within and event domain are unique. /(required)/
+- *event domain* - serves as a namespace for the event. A given event consumer /may have/ more than one domain. /(required)/
+- *event name* - serves to identify the event. An event with name X in domain A (=A:X=) is different than an event named X in domain B (=B:X=). The event generator /must ensure/ that the set of event names within and event domain are unique. /(required)/
 - *timestamp* - indicates when the event occurred. The event consumer will use the time that the event is received as a timestamp if the timestamp is not included in the event. /(optional)/
 - *attributes* - key-value pairs that further define and describe the event. The names and content of the attributes are wholly up to the discretion of the event generator. /(optional)/
 - *entity identifier* - Most events are raised for a particular entity. The event consumer is free to choose any identity scheme that serves its purpose. The operation and structure of the identifier are beyond the scope of this document. /(optional)/
@@ -89,8 +89,8 @@ Event generators are responsible for publishing a dictionary of events by domain
 An event consumer subscribes to an event generator by recording the consumer’s event signal URL. The semantics of the event signal URL are opaque to the event generator although its structure should have meaning to the event consumer.  The event signal URL encodes the entity identifier and thus represents an event consumer for a particular entity. 
 
 The event consumer creates the event signal URL, as follows:
-- The schema must be either =http= or =https=. 
-- The domain may be any domain that is convenient to the event consumer.
+- The schema /must be/ either =http= or =https=. 
+- The domain /may be/ any domain that is convenient to the event consumer.
 - The path /may contain/ any static information useful to the event consumer in processing the request. If the event consumer uses an entity identifier, it /must be/ placed in the path. Since the identifier is placed in the path, it /must be/ URL encoded if it contains characters that cannot be put in the path. 
 
 The event signal URL /must not/ contain a query string. 
@@ -99,18 +99,18 @@ The event signal URL /must not/ contain a query string.
 
 The event generator signals an event by encoding the event as a query string, appending it to the event signal URLs that it has recorded, and using HTTP to signal each URL.
  
-The event generator should signal events using HTTP POST using the event signal URL. The event domain, event name, and attributes must be sent as key-value pairs in the body of the POST. Keys with a leading underscore character are reserved.
+The event generator should signal events using HTTP POST using the event signal URL. The event domain, event name, and attributes /must be/ sent as key-value pairs in the body of the POST. Keys with a leading underscore character are reserved.
  
-There are two required key-value pairs that must be sent:
+There are two required key-value pairs that /must be/ sent:
 - =_domain= is the key for the event domain
 - =_name= is the key for the event name
 
 The values sent for =_domain= and =_name= /must be/ a string made of alphanumeric, underscore, dot, and dash characters =[a-zA-Z0-9_.-]=.  
 In addition to the required key-value pairs given above, the generator may include any other attributes that the generator wishes to send with the event. 
 
-Generators may include a timestamp indicating when the event occurred (which can be different than when it was signalled) using the =_timestamp= key. The value of this field is an HTTP-date. Consumers /may use/ the value in the =_timestamp= field in lieu of the time when the signal was received.
+Generators /may include/ a timestamp indicating when the event occurred (which can be different than when it was signalled) using the =_timestamp= key. The value of this field is an HTTP-date. Consumers /may use/ the value in the =_timestamp= field in lieu of the time when the signal was received.
 
-When sent as the body of an HTTP POST these parameters must be encoded using one of the methods shown in the following table. Note that the Content-Type header must be set to the appropriate mime-type for the event consumer to understand the message. 
+When sent as the body of an HTTP POST these parameters /must be/ encoded using one of the methods shown in the following table. Note that the =Content-Type= header /must be/ set to the appropriate mime-type for the event consumer to understand the message. 
 
 | *encoding* | *mime-type*                       |
 | form       | application/x-www-form-urlencoded |
@@ -126,16 +126,23 @@ If the body is JSON-encoded, the encoding should be a JSON object containing the
 
 ** Using HTTP GET
 
-An event generator may use an HTTP GET instead of POST in circumstances where a POST is difficult. In this case, the key-value pairs representing the event name, domain, and attributes are encoded as a query string as follows:
-<event-signal-url>?field1=value1&field2=value2&field3=value3...
+An event generator /may use/ an HTTP GET instead of POST in circumstances where a POST is difficult. In this case, the key-value pairs representing the event name, domain, and attributes are encoded as a query string as follows:
+
+: <event-signal-url>?field1=value1&field2=value2&field3=value3...
+
 The query string is composed of a series of field-value pairs.
-The field-value pairs are each separated by an equals sign. The equals sign may be omitted if the value is an empty string.
+
+The field-value pairs are each separated by an equals sign. The equals sign /may be/ omitted if the value is an empty string.
+
 The series of pairs is separated by the ampersand, '&' or semicolon, ';'.
 
 Multiple values can also be associated with a single field:
-<event-signal-url>?field1=value1&field1=value2&field1=value3...
-The keys and values must be URL encoded to encode reserved URL characters.
-Event consumers must accept both POST and GET signals. 
+
+: <event-signal-url>?field1=value1&field1=value2&field1=value3...
+
+The keys and values /must be/ URL encoded to encode reserved URL characters.
+
+Event consumers /must accept/ both POST and GET signals. 
 
 ** Success
 
@@ -145,21 +152,25 @@ The response content is unspecified in this version of the API. Event consumers 
 ** Error Handling
 
 An HTTP status code of 4xx (client error) or 5xx (server error) represents that the event consumer has failed to receive the event signalled. 
-Failed event signals with a status code of 500 (internal service error), 503 (service unavailable), or 504 (gateway timeout) may be retried by the event generator.  Event consumers may indicate a willingness to entertain retries using the HTTP Retry-After header on a 503 status. Event generators should respect the Retry-After header. 
-Event generators must not retry event signals for error status codes other than 500, 503, or 504. 
+
+Failed event signals with a status code of 500 (internal service error), 503 (service unavailable), or 504 (gateway timeout) may be retried by the event generator.  Event consumers /may indicate/ a willingness to entertain retries using the HTTP Retry-After header on a 503 status. Event generators should respect the Retry-After header. 
+
+Event generators /must not/ retry event signals for error status codes other than 500, 503, or 504. 
 
 ** Service Termination
 
-Event consumers can indicate that they no longer wish to receive event signals by returning the HTTP status code 410 (gone). Event generators must respect the 410 code and must not continue signalling events to that consumer after receiving a 410 response. 
+Event consumers can indicate that they no longer wish to receive event signals by returning the HTTP status code 410 (gone). Event generators /must respect/ the 410 code and /must not/ continue signalling events to that consumer after receiving a 410 response. 
 
 ** Redirection
 
-Event generators must respond correctly to redirection (HTTP status codes 3xx) responses from the consumer. 
+Event generators /must respond/ correctly to redirection (HTTP status codes 3xx) responses from the consumer. 
 
 ** Event Subscription
 
-An event consumer subscribes to events from a particular event generator by providing an event signal URL structured as described above. The URL might be registered via an API that the event generator provides or via a user interface into which a human copies the event signal URL. The event consumer must provide an interface where users can generate correctly formatted URLs with an appropriate, embedded entity identifier.  
-Users generally control event consumers (whether stand-alone or multi-tenanted). Users configure event consumers by subscribing to event generators of interest. Event consumers must be designed with the events for particular event generators in mind. 
+An event consumer subscribes to events from a particular event generator by providing an event signal URL structured as described above. The URL might be registered via an API that the event generator provides or via a user interface into which a human copies the event signal URL. The event consumer /must provide/ an interface where users can generate correctly formatted URLs with an appropriate, embedded entity identifier.  
+
+Users generally control event consumers (whether stand-alone or multi-tenanted). Users configure event consumers by subscribing to event generators of interest. Event consumers /must be/ designed with the events for particular event generators in mind. 
+
 The flow of a user manually subscribing an event consumer to an event generator manually is shown in the figure below.
 
 [[http://www.eventedapi.org/subscription.png]]
