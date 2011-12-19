@@ -5,12 +5,14 @@
 
 * Authors
 
-  Sam Curren, <sxc@kynetx.com>
+Sam Curren, <sxc@kynetx.com>
 
-  Phillip J. Windley, <pjw@kynetx.com>
+Phillip J. Windley, <pjw@kynetx.com>
 
 * Status
-  Draft, for review
+Draft, for review and comment.
+
+Our intention it to submit this specifications to a standards process in 2012.   
   
 
 * Overview
@@ -20,6 +22,18 @@ Events indicate something has happened. In this they differ from the request-res
 APIs have become an economic imperative for many companies. But APIs based solely on request-response style interactions limit integrations to those where one system always knows what it wants from the other. The calling service must script the interaction and the APIs simply follow along. 
 
 We envision a world where applications integrate multiple products and services as equals based on event-driven interactions. Evented APIs, following the form described in this document, enable building such applications. 
+
+There are at least three different modes in which an API might send data:
+
+- *Continuous stream* - some system need to be in near-constant contact with the other participants. For example, a chat system needs to be ready to send and receive information from the participants at almost any time. Another way to think of these kinds of API interactions is as persistent connections.
+- *Broadcast* - some systems have data that they must distribute to many participants. A blog post being sent to multiple subscribers is an example of this.
+- *Evented* - some systems need to push data to one or a few other systems when something happens (i.e. when there’s an event). Some APIs are for user (entity) accounts and the data being sent is related to a specific entity and destined for another system where that same user has an account. Some are merely point-to-point connections. The key idea is that there’s an event that needs to be seen by a few other systems.
+
+The first and second scenarios have specifications that are widely known, if unequally used. Continuous stream applications can use Cometd or Web sockets. PubSubHubBub (PuSH) is commonly used in broadcast-style applications.
+
+Twilio is probably the best example of an evented API. They’re using Webhooks, a good solution for this sort of thing. Evented APIs are specializations of Webhooks. All APIs that follow the Evented API specification are Webhooks, but not all Webhooks are examples of evented APIs.
+
+Evented APIs are not meant to be used as continuous streams or broadcast subscriptions. They are designed for one-to-one or one-to-a-few interactions. 
 
 * General Concepts
 
@@ -170,7 +184,7 @@ This, combined with the 410 error response, will serve to prevent attackers from
 
 ** Change _timestamp argument to XSD:Datetime
 
-This would simplify parsing of timestamps. ([Docs for XSD:Datetime http://www.w3.org/TR/xmlschema-2/#dateTime])
+This would simplify parsing of timestamps. ([[http://www.w3.org/TR/xmlschema-2/#dateTime][Docs for XSD:Datetime]] )
 
 ** Adopt Salmon Magic Signatures as an optional event signature
 
@@ -181,7 +195,7 @@ For systems processing events needing more security then SSL, allow for the use 
 Activity streams give a semantic schema for activities (events). Activity streams support JSON encoding, so they make a fine payload for an event. Support for them would entail specifying that Activity stream payloads require using the application/activitystream+json mime-type so that event consumers know they’re being sent an activity stream encoded event. 
 When mapping activity streams structures, the _domain should be considered to be activitystreams, and the _name should be equal to the verb specified within the activity streams structure.
 
-** Change Event Name to Event Type, and _name to _type
+** Change Event Name to Event Type, and =_name= to =_type=
 
 Using Type would represent the real value of the name/type attribute of an event more clearly then Name. 
 
@@ -217,10 +231,7 @@ The following questions and answers explain some of the nuances of Evented APIs.
 
 Streaming APIs typically open a long-lived Web socket to transfer data more or less continuously. Streaming APIs, such as maintained by Twitter, are an efficient way to transfer lots of data. For sites with less volume, and particularly for consuming apps, a streaming API is not very efficient. Evented APIs are efficient and scale in a well-known, efficient manner. This makes evented API’s easier to implement, both for the generator and the consumer.
 
-** How does an evented API compare with Atom and PubSubHubub (PuSH)?
-
-The complexity of using a distribution hub doesn’t make sense for anything but large systems. PuSH was a way to reduce polling on the origin server, but it’s really a stop-gap for better evented systems.
-How does an evented API compare with Pushed Data?
+** How does an evented API compare with Pushed Data?
 
 Pushed Data, most popularly used by Flickr, is really a simplified form of PuSH. There isn’t anything wrong with this, but there is value in standardizing the approach.
 
@@ -245,6 +256,6 @@ It is a good idea to send enough information as event attributes to prevent comm
 The event should be sent immediately, but there is room for using background systems to send the events. Simpler systems can simply send the event in the same thread handling the original request. Most evented systems will operate fine if the event is sent within a minute of occurring, though faster transmission might be required for some systems. The exact timing is up to the generator, who has the best idea of what timing makes sense. 
 
 
-*** Copyright © Copyright 2011 by Sam Curren and Phillip J. Windley. 
+*** Copyright © 2011 by Sam Curren and Phillip J. Windley. 
 
 
