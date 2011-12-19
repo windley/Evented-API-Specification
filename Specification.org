@@ -5,9 +5,9 @@
 
 * Authors
 
-Sam Curren, <sxc@kynetx.com>
+Sam Curren, =<sxc@kynetx.com>=
 
-Phillip J. Windley, <pjw@kynetx.com>
+Phillip J. Windley, =<pjw@kynetx.com>=
 
 * Status
 Draft, for review and comment.
@@ -105,7 +105,7 @@ There are two required key-value pairs that /must be/ sent:
 - =_domain= is the key for the event domain
 - =_name= is the key for the event name
 
-The values sent for =_domain= and =_name= /must be/ a string made of alphanumeric, underscore, dot, and dash characters =[a-zA-Z0-9_.-]=.  
+The values sent for =_domain= and =_name=  /must be/ a string made of alphanumeric, underscore, dot, and dash characters =[a-zA-Z0-9_.-]=.  
 In addition to the required key-value pairs given above, the generator may include any other attributes that the generator wishes to send with the event. 
 
 Generators /may include/ a timestamp indicating when the event occurred (which can be different than when it was signalled) using the =_timestamp= key. The value of this field is an HTTP-date. Consumers /may use/ the value in the =_timestamp= field in lieu of the time when the signal was received.
