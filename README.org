@@ -6,54 +6,65 @@
 * Authors
 
   Sam Curren, <sxc@kynetx.com>
+
   Phillip J. Windley, <pjw@kynetx.com>
 
 * Status
   Draft, for review
- 
+  
 
 * Overview
 
-  Events indicate something has happened. In this they differ from the request-response interaction style popular on the Web. Event-based systems are declarative whereas request-response systems are interrogatory. The difference between events (“this happened”) and requests (“will you do this?”) offers benefits in looser coupling of components as well as semantic encapsulation (see On Hierarchies and Networks for more detail).
+Events indicate something has happened. In this they differ from the request-response interaction style popular on the Web. Event-based systems are declarative whereas request-response systems are interrogatory. The difference between events (“this happened”) and requests (“will you do this?”) offers benefits in looser coupling of components as well as semantic encapsulation (see On Hierarchies and Networks for more detail).
 
-  APIs have become an economic imperative for many companies. But APIs based solely on request-response style interactions limit integrations to those where one system always knows what it wants from the other. The calling service must script the interaction and the APIs simply follow along. 
+APIs have become an economic imperative for many companies. But APIs based solely on request-response style interactions limit integrations to those where one system always knows what it wants from the other. The calling service must script the interaction and the APIs simply follow along. 
+
 We envision a world where applications integrate multiple products and services as equals based on event-driven interactions. Evented APIs, following the form described in this document, enable building such applications. 
-General Concepts
+
+* General Concepts
 
 The following concepts are useful in understanding the specification that follows. 
-Components and General Operation
+
+** Components and General Operation
 
 Event-driven systems comprise 
-event generators that send events, 
-event consumers that consume and act on events, and 
-a system for distributing events. 
+- event generators that send events, 
+- event consumers that consume and act on events, and 
+- a system for distributing events. 
 
 Events are pushed from an event generator to event consumers when the event generators sees a relevant state change. Event consumers indicate their desire to see specific events through subscription. In the following diagram events from generators A-D are received by event consumers. Note that some events (e.g. A) are received by multiple consumers, some consumers received more than one event, and some events (e.g. C) are received by no one. 
+
 [[http://www.eventedapi.org/components.png]]
+
 Using an Evented API, any program can act as as either an event generator or event consumer so long as it meets certain, minimal requirements (described below). The Internet--specifically the HTTP protocol--acts as the event distribution network. Subscription occurs when an event generator records the event signal URL for an event consumer. 
-Events are Not Remote Procedure Calls
+
+** Events are Not Remote Procedure Calls
 
 Events are not Remote Procedure Calls (RPC) or requests. Events are a notification that something significant occurred. Events do not carry any instructions or directives. Events have attributes whereas an RPC has parameters. 
 Years ago, computer designers discovered that having some components interrupt the CPU when they needed service was more efficient and easier to design and program. Before interrupts, the CPU polled components to determine if they needed service. Without events, an application must poll an API which is difficult to manage and expensive from a computational and communications standpoint. Event-driven systems gain the same benefits that interrupts gave hardware designers years ago. 
-Events are State Changes
+
+** Events are State Changes
 
 An event is a notification of a state change in an Evented API. The temporal granularity of an event is assumed to be small, although unspecified.  Event generators are free to determine what “state change” means. Event generators may specify a timestamp indicating when the event . occurred. If the timestamp is missing in the event signal, the timestamp of the event is determined by the timestamp of its delivery. 
-Language and Platform Agnostic
+
+** Language and Platform Agnostic
 
 The Evented API specification is designed to be language and platform agnostic. The only language requirement is that event generators must be able to perform an HTTP POST or GET and event consumers must be able to receive them (they are associated with or act as an HTTP server). Occasionally-connected event consumers must run behind an event proxy service that stores and forwards events.
-Event Generator Bias
+
+** Event Generator Bias
 
 The Evented API specification has been designed so that signalling events by event generators is as easy as possible. Where work or complexity could be shifted from the event generator to the event consumer, we have done so. 
-How it Works
 
-Event Schema
+* How it Works
+
+* Event Schema
 
 An event has the following components:
-event domain - serves as a namespace for the event. A given event consumer may have more than one domain. (required)
-event name - serves to identify the event. An event with name X in domain A (A:X) is different than an event named X in domain B (B:X). The event generator must ensure that the set of event names within and event domain are unique. (required)
-timestamp - indicates when the event occurred. The event consumer will use the time that the event is received as a timestamp if the timestamp is not included in the event. (optional)
-attributes - key-value pairs that further define and describe the event. The names and content of the attributes are wholly up to the discretion of the event generator. (optional)
-entity identifier - Most events are raised for a particular entity. The event consumer is free to choose any identity scheme that serves its purpose. The operation and structure of the identifier are beyond the scope of this document. (optional)
+- event domain - serves as a namespace for the event. A given event consumer may have more than one domain. (required)
+- event name - serves to identify the event. An event with name X in domain A (A:X) is different than an event named X in domain B (B:X). The event generator must ensure that the set of event names within and event domain are unique. (required)
+- timestamp - indicates when the event occurred. The event consumer will use the time that the event is received as a timestamp if the timestamp is not included in the event. (optional)
+- attributes - key-value pairs that further define and describe the event. The names and content of the attributes are wholly up to the discretion of the event generator. (optional)
+- entity identifier - Most events are raised for a particular entity. The event consumer is free to choose any identity scheme that serves its purpose. The operation and structure of the identifier are beyond the scope of this document. (optional)
 
 Event Dictionary
 
