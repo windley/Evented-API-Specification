@@ -89,23 +89,31 @@ The event generator should signal events using HTTP POST using the event signal 
  
 There are two required key-value pairs that must be sent:
 - =_domain= is the key for the event domain
-- =_nam=e is the key for the event name
+- =_name= is the key for the event name
 
-The values sent for _domain and _name must be a string made of alphanumeric, underscore, dot, and dash characters [a-zA-Z0-9_.-].  
+The values sent for =_domain= and =_name= /must be/ a string made of alphanumeric, underscore, dot, and dash characters =[a-zA-Z0-9_.-]=.  
 In addition to the required key-value pairs given above, the generator may include any other attributes that the generator wishes to send with the event. 
-Generators may include a timestamp indicating when the event occurred (which can be different than when it was signalled) using the _timestamp key. The value of this field is an HTTP-date. Consumers may use the value in the _timestamp field in lieu of the time when the signal was received.
+
+Generators may include a timestamp indicating when the event occurred (which can be different than when it was signalled) using the =_timestamp= key. The value of this field is an HTTP-date. Consumers /may use/ the value in the =_timestamp= field in lieu of the time when the signal was received.
+
 When sent as the body of an HTTP POST these parameters must be encoded using one of the methods shown in the following table. Note that the Content-Type header must be set to the appropriate mime-type for the event consumer to understand the message. 
-encoding	mime-type
-form	application/x-www-form-urlencoded
-JSON	application/json
+
+|----------+-----------------------------------|
+| encoding | mime-type                         |
+|----------+-----------------------------------|
+| form     | application/x-www-form-urlencoded |
+| JSON     | application/json                  |
+|----------+-----------------------------------|
 
 If the body is JSON-encoded, the encoding should be a JSON object containing the keys and values as follows:
-{“_domain” : “web”,
- “_name” : “pageview”,
- “urls” : [“http://www.exampley.com/foo/bar.html”,
-           “http://www.google.com/search”]
-} 
-Using HTTP GET
+
+:{“_domain” : “web”,
+: “_name” : “pageview”,
+: “urls” : [“http://www.exampley.com/foo/bar.html”,
+:           “http://www.google.com/search”]
+:} 
+
+* Using HTTP GET
 
 An event generator may use an HTTP GET instead of POST in circumstances where a POST is difficult. In this case, the key-value pairs representing the event name, domain, and attributes are encoded as a query string as follows:
 <event-signal-url>?field1=value1&field2=value2&field3=value3...
